@@ -54,6 +54,7 @@ firewall() {
 return_route() { local gw network="$1"
     gw=$(ip route | awk '/default/ {print $3}')
     ip route add to $network via $gw dev eth0
+    echo "Adding route to ${network} via ${gw}"
 }
 
 ### timezone: Set the timezone for the container
@@ -148,21 +149,22 @@ while getopts ":hdfr:t:v:e:" opt; do
     case "$opt" in
         h) usage ;;
         d) DNS=true ;;
-        f) firewall; touch /vpn/.firewall ;;
-        r) return_route "$OPTARG" ;;
-        t) timezone "$OPTARG" ;;
-        v) eval vpn $(sed 's/^\|$/"/g; s/;/" "/g' <<< $OPTARG) ;;
-        e) eval externalvpn $(sed 's/^\|$/"/g; s/;/" "/g' <<< $OPTARG) ;;
+        f) FIREWALL=true ;;
+        r) ROUTE=$OPTARG ;;
+        t) TZ=$OPTARG ;;
+        v) VPN=$OPTARG ;;
+        e) EXTERNAL_CONF=$OPTARG ;;
         "?") echo "Unknown option: -$OPTARG"; usage 1 ;;
         ":") echo "No argument value for option: -$OPTARG"; usage 2 ;;
     esac
 done
 shift $(( OPTIND - 1 ))
 
+[[ "${VPN:-""}" ]] && eval vpn $(sed 's/^\|$/"/g; s/;/" "/g' <<< $VPN)
+[[ "${EXTERNAL_CONF:-""}" ]] && eval externalvpn $(sed 's/^\|$/"/g; s/;/" "/g' <<< $EXTERNAL_CONF)
 [[ "${FIREWALL:-""}" || -e /vpn/.firewall ]] && firewall
 [[ "${ROUTE:-""}" ]] && return_route "$ROUTE"
 [[ "${TZ:-""}" ]] && timezone "$TZ"
-[[ "${VPN:-""}" ]] && eval vpn $(sed 's/^\|$/"/g; s/;/" "/g' <<< $VPN)
 [[ "${DNS:-""}" ]] && dns
 
 if [[ $# -ge 1 && -x $(which $1 2>&-) ]]; then
@@ -174,6 +176,7 @@ elif ps -ef | egrep -v 'grep|openvpn.sh' | grep -q openvpn; then
     echo "Service already running, please restart container to apply changes"
 else
     [[ -e /vpn/vpn.conf ]] || { echo "ERROR: VPN not configured!"; sleep 120; }
+    [[ -z ${ROUTE} || ! -z $(grep redirect-gateway /vpn/vpn.conf) ]] || { echo "Auto-Adding redirect-gateway"; echo "redirect-gateway def1" >> /vpn/vpn.crt; }
     [[ -e /vpn/vpn-ca.crt || ! -z $(grep \<ca\> /vpn/vpn.conf) ]] || { echo "ERROR: VPN cert missing!"; sleep 120; }
     exec sg vpn -c "openvpn --config /vpn/vpn.conf"
 fi
