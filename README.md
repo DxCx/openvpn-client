@@ -89,6 +89,7 @@ make sure that `redirect-gateway def1` is set, otherwise routing may not work.
     Options (fields in '[]' are optional, '<>' are required):
         -h          This help
         -d          Use the VPN provider's DNS resolvers
+        -e '<url>'  If config does not exists, pull it as external url
         -f          Firewall rules so that only the VPN and DNS are allowed to
                     send internet traffic (IE if VPN is down it's offline)
         -r "<network>" CIDR network (IE 192.168.1.0/24)
@@ -110,6 +111,8 @@ ENVIRONMENT VARIABLES (only available with `docker run`)
  * `ROUTE` - As above, add a route to allow replies to your private network
  * `TZ` - As above, set a zoneinfo timezone, IE `EST5EDT`
  * `VPN` - As above, setup a VPN connection
+ * `FIREWALL` - As above, set firewall
+ * `EXTERNAL_CONF` - As above, pulls .ovpn config from url
 
 ## Examples
 
@@ -157,6 +160,16 @@ Or you can store it in the container:
                 -v 'vpn.server.name;username;password' tee /vpn/vpn-ca.crt \
                 >/dev/null
     sudo docker restart vpn
+
+### VPN configuration from external URL
+
+If you have your config file avilable from server,
+you can provide it's url to the config.
+then, on the initial run, the config will be downloaded and used:
+
+    sudo docker run -it --cap-add=NET_ADMIN --device /dev/net/tun --name vpn \
+                -v /some/path:/vpn -d dperson/openvpn-client \
+                -e 'http://www.someserver.com/profile.ovpn'
 
 ### Firewall
 

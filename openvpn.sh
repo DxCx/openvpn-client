@@ -125,7 +125,7 @@ usage() { local RC=${1:-0}
 Options (fields in '[]' are optional, '<>' are required):
     -h          This help
     -d          Use the VPN provider's DNS resolvers
-    -e '<url>' Pull external file from http
+    -e '<url>'  If config does not exists, pull it as external url
     -f          Firewall rules so that only the VPN and DNS are allowed to
                 send internet traffic (IE if VPN is down it's offline)
     -r \"<network>\" CIDR network (IE 192.168.1.0/24)
