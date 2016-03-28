@@ -71,7 +71,7 @@ For multiple services (non-existant 'foo' used as an example):
 The argument to the `-r` (route) command line argument must be your local
 network that you would connect to the server running the docker containers on.
 Running the following on your docker host should give you the correct network:
-`ip route | awk '!/ (docker0|br-)/ && /src/ {print $1}'`
+`ip route | awk '!/ (docker0|br-)/ && /src/ { printf "%s ", $1 }'`
 
     sudo cp /path/to/vpn.crt /some/path/vpn-ca.crt
     sudo docker run -it --cap-add=NET_ADMIN --device /dev/net/tun --name vpn \
