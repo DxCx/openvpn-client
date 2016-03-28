@@ -161,12 +161,12 @@ while getopts ":hdfr:t:v:e:" opt; do
 done
 shift $(( OPTIND - 1 ))
 
-[[ "${VPN:-""}" ]] && eval vpn $(sed 's/^\|$/"/g; s/;/" "/g' <<< $VPN)
-[[ "${EXTERNAL_CONF:-""}" ]] && eval externalvpn $(sed 's/^\|$/"/g; s/;/" "/g' <<< $EXTERNAL_CONF)
-[[ "${FIREWALL:-""}" || -e /vpn/.firewall ]] && firewall
-[[ "${ROUTE:-""}" ]] && return_route $ROUTE
-[[ "${TZ:-""}" ]] && timezone "$TZ"
-[[ "${DNS:-""}" ]] && dns
+[[ -z "${VPN:-""}" ]] && eval vpn $(sed 's/^\|$/"/g; s/;/" "/g' <<< $VPN)
+[[ -z "${EXTERNAL_CONF:-""}" ]] && eval externalvpn $(sed 's/^\|$/"/g; s/;/" "/g' <<< $EXTERNAL_CONF)
+[[ -z "${FIREWALL:-""}" || -e /vpn/.firewall ]] && firewall
+[[ -z "${ROUTE:-""}" ]] && return_route $ROUTE
+[[ -z "${TZ:-""}" ]] && timezone "$TZ"
+[[ -z "${DNS:-""}" ]] && dns
 
 if [[ $# -ge 1 && -x $(which $1 2>&-) ]]; then
     exec "$@"
@@ -177,7 +177,7 @@ elif ps -ef | egrep -v 'grep|openvpn.sh' | grep -q openvpn; then
     echo "Service already running, please restart container to apply changes"
 else
     [[ -e /vpn/vpn.conf ]] || { echo "ERROR: VPN not configured!"; sleep 120; }
-    [[ -z "${ROUTE}" || ! -z $(grep redirect-gateway /vpn/vpn.conf) ]] || { echo "Auto-Adding redirect-gateway"; echo "redirect-gateway def1" >> /vpn/vpn.crt; }
+    [[ -z "${ROUTE:-""}" || ! -z $(grep redirect-gateway /vpn/vpn.conf) ]] || { echo "Auto-Adding redirect-gateway"; echo "redirect-gateway def1" >> /vpn/vpn.crt; }
     [[ -e /vpn/vpn-ca.crt || ! -z $(grep \<ca\> /vpn/vpn.conf) ]] || { echo "ERROR: VPN cert missing!"; sleep 120; }
     exec sg vpn -c "openvpn --config /vpn/vpn.conf"
 fi
