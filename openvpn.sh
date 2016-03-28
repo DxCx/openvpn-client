@@ -161,12 +161,12 @@ while getopts ":hdfr:t:v:e:" opt; do
 done
 shift $(( OPTIND - 1 ))
 
-[[ -z "${VPN:-""}" ]] && eval vpn $(sed 's/^\|$/"/g; s/;/" "/g' <<< $VPN)
-[[ -z "${EXTERNAL_CONF:-""}" ]] && eval externalvpn $(sed 's/^\|$/"/g; s/;/" "/g' <<< $EXTERNAL_CONF)
-[[ -z "${FIREWALL:-""}" || -e /vpn/.firewall ]] && firewall
-[[ -z "${ROUTE:-""}" ]] && return_route $ROUTE
-[[ -z "${TZ:-""}" ]] && timezone "$TZ"
-[[ -z "${DNS:-""}" ]] && dns
+[[ "${VPN:-""}" ]] && eval vpn $(sed 's/^\|$/"/g; s/;/" "/g' <<< $VPN)
+[[ "${EXTERNAL_CONF:-""}" ]] && eval externalvpn $(sed 's/^\|$/"/g; s/;/" "/g' <<< $EXTERNAL_CONF)
+[[ "${FIREWALL:-""}" || -e /vpn/.firewall ]] && firewall
+[[ "${ROUTE:-""}" ]] && return_route $ROUTE
+[[ "${TZ:-""}" ]] && timezone "$TZ"
+[[ "${DNS:-""}" ]] && dns
 
 if [[ $# -ge 1 && -x $(which $1 2>&-) ]]; then
     exec "$@"
