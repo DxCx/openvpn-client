@@ -177,7 +177,7 @@ elif ps -ef | egrep -v 'grep|openvpn.sh' | grep -q openvpn; then
     echo "Service already running, please restart container to apply changes"
 else
     [[ -e /vpn/vpn.conf ]] || { echo "ERROR: VPN not configured!"; sleep 120; }
-    [[ -z ${ROUTE} || ! -z $(grep redirect-gateway /vpn/vpn.conf) ]] || { echo "Auto-Adding redirect-gateway"; echo "redirect-gateway def1" >> /vpn/vpn.crt; }
+    [[ -z "${ROUTE}" || ! -z $(grep redirect-gateway /vpn/vpn.conf) ]] || { echo "Auto-Adding redirect-gateway"; echo "redirect-gateway def1" >> /vpn/vpn.crt; }
     [[ -e /vpn/vpn-ca.crt || ! -z $(grep \<ca\> /vpn/vpn.conf) ]] || { echo "ERROR: VPN cert missing!"; sleep 120; }
     exec sg vpn -c "openvpn --config /vpn/vpn.conf"
 fi
