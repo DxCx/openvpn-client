@@ -51,10 +51,11 @@ firewall() {
 # Arguments:
 #   network) a CIDR specified network range
 # Return: configured return route
-return_route() { local gw network="$1"
-    gw=$(ip route | awk '/default/ {print $3}')
-    ip route add to $network via $gw dev eth0
-    echo "Adding route to ${network} via ${gw}"
+return_route() { local gw=$(ip route | awk '/default/ {print $3}')
+	for network in "$@"; do
+		ip route add to $network via $gw dev eth0
+		echo "Adding route to ${network} via ${gw}"
+	done
 }
 
 ### timezone: Set the timezone for the container
