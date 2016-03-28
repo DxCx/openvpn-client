@@ -78,6 +78,8 @@ Running the following on your docker host should give you the correct network:
                 -v /some/path:/vpn -d dperson/openvpn-client \
                 -r 192.168.1.0/24 -v 'vpn.server.name;username;password'
 
+Routing is supported for more then one network, for example, -r "192.168.1.0/24 10.7.0.0/16" will add both routes.
+
 **NOTE**: if you don't use the `-v` to configure your VPN, then you'll have to
 make sure that `redirect-gateway def1` is set, otherwise routing may not work.
 
