@@ -161,10 +161,12 @@ while getopts ":hdfr:t:v:e:" opt; do
 done
 shift $(( OPTIND - 1 ))
 
+echo "ROUTE DBG: ${ROUTE}"
+
 [[ "${VPN:-""}" ]] && eval vpn $(sed 's/^\|$/"/g; s/;/" "/g' <<< $VPN)
 [[ "${EXTERNAL_CONF:-""}" ]] && eval externalvpn $(sed 's/^\|$/"/g; s/;/" "/g' <<< $EXTERNAL_CONF)
 [[ "${FIREWALL:-""}" || -e /vpn/.firewall ]] && firewall
-[[ "${ROUTE:-""}" ]] && return_route "$ROUTE"
+[[ "${ROUTE:-""}" ]] && return_route $ROUTE
 [[ "${TZ:-""}" ]] && timezone "$TZ"
 [[ "${DNS:-""}" ]] && dns
 
