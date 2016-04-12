@@ -24,6 +24,7 @@ set -o nounset                              # Treat unset variables as an error
 # Return: conf file that uses VPN provider's DNS resolvers
 dns() { local conf="/vpn/vpn.conf"
     if [[ -z $(grep script-security $conf) ]]; then
+    	echo "Adding DNS Settings..."
 		echo "# This updates the resolvconf with dns settings" >>$conf;
 		echo "script-security 2" >>$conf;
 		echo "up /etc/openvpn/update-resolv-conf" >>$conf;
