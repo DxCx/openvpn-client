@@ -94,7 +94,6 @@ vpn() { local server="$1" user="$2" pass="$3" \
 		resolv-retry infinite
 		nobind
 		persist-key
-		persist-tun
 		ca /vpn/vpn-ca.crt
 		tls-client
 		remote-cert-tls server
@@ -180,6 +179,7 @@ elif ps -ef | egrep -v 'grep|openvpn.sh' | grep -q openvpn; then
 else
     [[ -e /vpn/vpn.conf ]] || { echo "ERROR: VPN not configured!"; sleep 120; }
     [[ -z "${ROUTE:-""}" || ! -z $(grep redirect-gateway /vpn/vpn.conf) ]] || { echo "Auto-Adding redirect-gateway"; echo "redirect-gateway def1" >> /vpn/vpn.conf; }
+    [[ -z $(grep persist-tun /vpn/vpn.conf) ]] || { echo "Presist Tunnel detected. Removing to allow reconnection"; sed -i '/persist-tun/d' /vpn/vpn.conf; }
     [[ -e /vpn/vpn-ca.crt || ! -z $(grep \<ca\> /vpn/vpn.conf) ]] || { echo "ERROR: VPN cert missing!"; sleep 120; }
     exec sg vpn -c "openvpn --config /vpn/vpn.conf"
 fi
